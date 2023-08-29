@@ -338,8 +338,8 @@ def plot_history(history, window=1):
 # ============ T E S T I N G =====================
 
 def model_inference(prompt, model, tokenizer, stop_token_id=None, max_new_tokens=1024, 
-                    num_return_sequences=1, use_cache=True):    
-    prompt_t = tokenizer(prompt, return_tensors='pt').to(device1)
+                    num_return_sequences=1, use_cache=True, device='cuda'):    
+    prompt_t = tokenizer(prompt, return_tensors='pt').to(device)
     max_length = prompt_t['input_ids'].shape[-1] + max_new_tokens
     eos_token_id = stop_token_id or tokenizer.eos_token_id
     with torch.inference_mode():
@@ -361,8 +361,8 @@ def model_inference(prompt, model, tokenizer, stop_token_id=None, max_new_tokens
     return results
 
 
-def test_gsm(model, tokenizer, template, end_of_answer_token_id = 13, verbose=True, 
-             max_new_tokens=32, num_return_sequences = 8,test_range = (0, 200)):
+def test_gsm(model, tokenizer, template, test_dataset, end_of_answer_token_id = 13, verbose=True, 
+             max_new_tokens=32, num_return_sequences = 8, test_range = (0, 200)):
     log = []
 
     pbar = trange(*test_range)
@@ -370,7 +370,7 @@ def test_gsm(model, tokenizer, template, end_of_answer_token_id = 13, verbose=Tr
         if verbose:
             print(q_id, end=': ')
         start = time.time()
-        ex = ex_split(test_examples[q_id])
+        ex = ex_split(test_dataset[q_id])
 
         prompt = template.format(ex['question'])
         res = model_inference(prompt, model, tokenizer, 
@@ -402,7 +402,7 @@ def test_gsm(model, tokenizer, template, end_of_answer_token_id = 13, verbose=Tr
 
 
 def score_log(log):
-    # returns majority accuracy and indicidual accuracy
+    # returns majority accuracy and average accuracy
     
     maj_acc = sum([int(l['verdict']) for l in log]) / len(log)  # Maj@1:
 
@@ -413,9 +413,12 @@ def score_log(log):
         for a in all_answers:
             num += (a == gt)
             den += 1
-    ind_acc = num / den
+    avg_acc = num / den, 4
+    
+    maj_acc = round(maj_acc, 4)
+    avg_acc = round(avg_acc, 4)
 
-    return maj_acc, ind_acc
+    return maj_acc, avg_acc
 
 
 import re
