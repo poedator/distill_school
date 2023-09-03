@@ -45,11 +45,13 @@ class DSPipeline():
             '''When meta tensors enabled, use checkpoints'''
             self.config = AutoConfig.from_pretrained(self.model_name)
             self.repo_root, self.checkpoints_json = self._generate_json(checkpoint_path)
-
+            print("LOADING FROM CONFIG ON META DEVICE")
             with deepspeed.OnDevice(dtype=torch.float16, device="meta"):
                 self.model = AutoModelForCausalLM.from_config(self.config)
         else:
-            self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
+            print("LOADING FROM PRETRAINED")
+            self.model = AutoModelForCausalLM.from_pretrained(
+                self.model_name, low_cpu_mem_usage=True, torch_dtype='auto')
 
         self.model.eval()
 
@@ -57,16 +59,13 @@ class DSPipeline():
             self.model.half()
 
 
-    def __call__(self,
-                inputs=["test"],
-                num_tokens=100,
-                do_sample=False):
+    def __call__(self, inputs=["test"], **kwargs):
         if isinstance(inputs, str):
             input_list = [inputs]
         else:
             input_list = inputs
 
-        outputs = self.generate_outputs(input_list, num_tokens=num_tokens, do_sample=do_sample)
+        outputs = self.generate_outputs(input_list, **kwargs)
         return outputs
 
 
@@ -98,11 +97,8 @@ class DSPipeline():
         return repo_root, checkpoints_json
 
 
-    def generate_outputs(self,
-                         inputs=["test"],
-                         num_tokens=100,
-                         do_sample=False):
-        generate_kwargs = dict(max_new_tokens=num_tokens, do_sample=do_sample)
+    def generate_outputs(self, inputs=["test"], **kwargs):
+        generate_kwargs = dict(**kwargs)
 
         input_tokens = self.tokenizer.batch_encode_plus(inputs, return_tensors="pt", padding=True)
         for t in input_tokens:
