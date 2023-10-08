@@ -1,0 +1,10 @@
+DeepSpeedExamples/*
+exps/*
+peft_save/*
+logs_save/
+.ipynb_checkpoints/*
+__pycache__/*
+deepspeed_example_textgen/tmp*
+deepspeed_example_textgen/.ipynb_checkpoints/*
+RECYCLE/*
+deepspeed_example_textgen/run-generation-script/.ipynb_checkpoints/*
