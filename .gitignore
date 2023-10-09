@@ -8,3 +8,13 @@ deepspeed_example_textgen/tmp*
 deepspeed_example_textgen/.ipynb_checkpoints/*
 RECYCLE/*
 deepspeed_example_textgen/run-generation-script/.ipynb_checkpoints/*
+deepspeed_example_textgen/__pycache__/*
+gen_deepspeed/__pycache__/*
+gen_deepspeed/__pycache__/utils.cpython-311.pyc
+gen_deepspeed/__pycache__/utils.cpython-39.pyc
+*.ipynb
+*.json
+deepspeed_example_textgen/*
+*.pt
+*.pyc
+gen_deepspeed/__pycache__/utils.*.pyc

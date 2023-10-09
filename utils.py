@@ -161,12 +161,14 @@ class CoTDataset(Dataset):
 
         # teacher_prefix = f"{self.prompt0}\nQuestion: {ex['question']}\n"
         teacher_prefix = f"{self.prompt0}\nQuestion: {ex['question']}\nLet's think step by step: {steps}\n"
+        cot8_prefix = f"{self.prompt0}\nQuestion: {ex['question']}\nLet's think step by step:"
         student_prefix = f"Question: {ex['question']}\n"
         # main_text = f"Let's think step by step: {steps} The answer is {answer}."
         main_text = f"The answer is {answer}."
                 
         out = dict(teacher_prefix = teacher_prefix,
                     student_prefix = student_prefix,
+                    cot8_prefix = cot8_prefix,
                     main_text = main_text
                    )
         return out
