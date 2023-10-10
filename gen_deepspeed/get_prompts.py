@@ -1,44 +1,33 @@
-# generate prompts
 
-import torch
-# from torch.utils.data import Dataset, DataLoader
+PROMPT_COT = "\n".join([
+        "Question: There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. "
+        "How many trees did the grove workers plant today?",
+        "Let's think step by step: There are 15 trees originally. Then there were 21 trees after some more were planted. "
+        "So there must have been 21 - 15 = 6. The answer is 6.",
+        "Question: If there are 3 cars in the parking lot and 2 more cars arrive, how many cars are in the parking lot?",
+        "Let's think step by step: There are originally 3 cars. 2 more cars arrive. 3 + 2 = 5. The answer is 5.",
+        "Question: Leah had 32 chocolates and her sister had 42. If they ate 35, how many pieces do they have left in total?",
+        "Let's think step by step: Originally, Leah had 32 chocolates. Her sister had 42. So in total they had 32 + 42 = 74. "
+        "After eating 35, they had 74 - 35 = 39. The answer is 39.",
+        "Question: Jason had 20 lollipops. He gave Denny some lollipops. Now Jason has 12 lollipops. How many lollipops did Jason give to Denny?",
+        "Let's think step by step: Jason started with 20 lollipops. Then he had 12 after giving some to Denny. "
+        "So he gave Denny 20 - 12 = 8. The answer is 8.",
+        "Question: Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?",
+        "Let's think step by step: Shawn started with 5 toys. If he got 2 toys each from his mom and dad, then that is 4 more toys. "
+        "5 + 4 = 9. The answer is 9.",
+        "Question: There were nine computers in the server room. Five more computers were installed each day, from monday to thursday. "
+        "How many computers are now in the server room?",
+        "Let's think step by step: There were originally 9 computers. For each of 4 days, 5 more computers were added. "
+        "So 5 * 4 = 20 computers were added. 9 + 20 is 29. The answer is 29.",
+        "Question: Michael had 58 golf balls. On tuesday, he lost 23 golf balls. On wednesday, he lost 2 more. "
+        "How many golf balls did he have at the end of wednesday?",
+        "Let's think step by step: Michael started with 58 golf balls. After losing 23 on tuesday, he had 58 - 23 = 35. "
+        "After losing 2 more, he had 35 - 2 = 33 golf balls. The answer is 33.",
+        "Question: Olivia has $23. She bought five bagels for $3 each. How much money does she have left?",
+        "Let's think step by step: Olivia had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars. "
+        "So she has 23 - 15 dollars left. 23 - 15 is 8. The answer is 8.",
+    ])
 
-import os, sys
-from functools import partial
-import transformers
 
-
-sys.path.append(os.path.join(os.environ["HOME"], 'school'))  # School path
-GSM8K_PATH = os.path.join(os.environ["HOME"], 'gsm8k')
-sys.path.append(GSM8K_PATH)  # GSM8K_PATH
-from ..utils import CoTDataset, collate_cot_batch, get_tokenizers
-from prompts import *
-from grade_school_math.dataset import get_examples, GSMDataset
-
-## Args / params
-
-MODEL_NAME = 'meta-llama/Llama-2-7b-hf'
-prefix_tokenizer, suffix_tokenizer = get_tokenizers(MODEL_NAME)
-
-def get_dataset():
-
-    ## Prompt
-
-    prompt_cot = get_cot_hub_prompt(raw=False)
-    collate = partial(collate_cot_batch, prefix_tokenizer=prefix_tokenizer, suffix_tokenizer=suffix_tokenizer)
-
-    train_examples = get_examples("train", data_path=os.path.join(GSM8K_PATH, 'grade_school_math/data'))
-    dataset_train = CoTDataset(train_examples, prompt_cot)
-    print(f"{len(dataset_train)=}")
-
-    batch_size=3
-    for i in range(0, len(dataset_train), batch_size):
-        batch = [dataset_train[i+j]['cot8_prefix'] for j in range(batch_size)]
-        break
-
-    batch_pt = prefix_tokenizer(batch, return_tensors='pt', padding='longest')
-
-    # batch_pt['input_ids'].shape
-
-    print(batch)
-    print(batch_pt['input_ids'].shape)
+if __name__ == "__main__":
+    print(PROMPT_COT)

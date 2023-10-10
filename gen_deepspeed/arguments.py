@@ -20,3 +20,4 @@ parser.add_argument("--world_size", type=int, default=int(os.getenv("WORLD_SIZE"
 parser.add_argument("--test_hybrid_engine", action='store_true', help="enable hybrid engine testing")
 parser.add_argument("--start_id", type=int, default=0)
 parser.add_argument("--end_id", type=int, default=24)
+parser.add_argument("--out_file", default="results.json", required=False, type=str, help="output file path")
